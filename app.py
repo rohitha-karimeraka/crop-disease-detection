@@ -7,23 +7,24 @@ import gdown
 
 app = Flask(__name__)
 
-# -----------------------------
-# 1. Download model from Google Drive (only once)
-# -----------------------------
+# -------------------------
+# Download model from Google Drive (only once)
+# -------------------------
 MODEL_PATH = "crop_disease_cnn_model.h5"
 
 if not os.path.exists(MODEL_PATH):
-    url = "https://drive.google.com/uc?id=1350D2tIUDguykuVibtNpwlFuogbX5FvO"
+    file_id = "1350D2tIUDguykuVibtNpwlFuogbX5FvO"
+    url = f"https://drive.google.com/uc?id={file_id}"
     gdown.download(url, MODEL_PATH, quiet=False)
 
-# -----------------------------
-# 2. Load model
-# -----------------------------
+# -------------------------
+# Load model
+# -------------------------
 model = tf.keras.models.load_model(MODEL_PATH)
 
-# -----------------------------
-# 3. Class labels (folder order MUST match training)
-# -----------------------------
+# -------------------------
+# Class names (folder order)
+# -------------------------
 class_names = [
     "Bacterial leaf blight",
     "Blight",
@@ -37,22 +38,15 @@ class_names = [
     "healthy"
 ]
 
-# -----------------------------
-# 4. Upload folder
-# -----------------------------
 UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# -----------------------------
-# 5. Routes
-# -----------------------------
 @app.route("/", methods=["GET", "POST"])
 def home():
     prediction = None
 
     if request.method == "POST":
-        file = request.files.get("image")
-
+        file = request.files["image"]
         if file:
             img_path = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(img_path)
@@ -66,8 +60,5 @@ def home():
 
     return render_template("index.html", prediction=prediction)
 
-# -----------------------------
-# 6. Run app
-# -----------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
