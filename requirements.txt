@@ -2,4 +2,6 @@ flask
 tensorflow
 pillow
 numpy
+gdown
 gunicorn
+
